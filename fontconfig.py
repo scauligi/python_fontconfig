@@ -21,6 +21,7 @@ A ctypes-based binding for the Fontconfig API, for Python
 # Boston, MA 02110-1301, USA
 #-
 
+import sys
 import enum
 import ctypes as ct
 from weakref import \
@@ -32,9 +33,28 @@ except ImportError :
     freetype = None
 #end try
 
-fc = ct.cdll.LoadLibrary("libfontconfig.so.1")
+LIBNAME = \
+    {
+        "linux" :
+            {
+                "libc" : "libc.so.6",
+                "fontconfig" : "libfontconfig.so.1",
+            },
+        "openbsd6" :
+            {
+                "libc" : "libc.so.7",
+                "fontconfig" : "libfontconfig.so.11",
+            },
+        "darwin" :
+            {
+                "libc" : "libc.dylib",
+                "fontconfig" : "libfontconfig.dylib",
+            },
+    }[sys.platform]
 
-libc = ct.cdll.LoadLibrary("libc.so.6")
+fc = ct.cdll.LoadLibrary(LIBNAME["fontconfig"])
+
+libc = ct.cdll.LoadLibrary(LIBNAME["libc"])
 
 class FC :
     "useful definitions from fontconfig/*.h. You will need to use the constants," \
